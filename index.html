@@ -549,12 +549,13 @@ window.addEventListener('resize',()=>{sizeRenderer();drawPlan();renderer.render(
 // ---------- Downloads (one menu, same engine as v1) ----------
 function downloadURI(uri,name){const a=document.createElement('a');a.href=uri;a.download=name;document.body.appendChild(a);a.click();a.remove();}
 function safeName(s){return (s||'design').replace(/[^a-zA-Z0-9-_]+/g,'-').slice(0,40);}
-function capturePNG(){renderer.render(scene,camera);return gl.toDataURL('image/png');}
+function capturePNG(){if(mode==='draw'){drawPlan();return plan.toDataURL('image/png');}renderer.render(scene,camera);return gl.toDataURL('image/png');}
 $('dlPngBtn').onclick=()=>{
-  try{const uri=capturePNG();downloadURI(uri,safeName(project.name)+'-'+safeName(curFloor().name)+'-'+currentView+'.png');$('dlStatus').textContent='✅ Photo downloaded — '+currentView+' view of '+curFloor().name+'.';}
+  try{const uri=capturePNG();downloadURI(uri,safeName(project.name)+'-'+safeName(curFloor().name)+'-'+(mode==='draw'?'plan':currentView)+'.png');$('dlStatus').textContent='✅ Photo downloaded — '+(mode==='draw'?'plan view':currentView+' view')+' of '+curFloor().name+'.';}
   catch(err){$('dlStatus').textContent='❌ Could not download the photo: '+err.message;}
 };
 $('dlAllBtn').onclick=async()=>{
+  if(mode!=='3d'){setMode('3d');await new Promise(r=>setTimeout(r,300));}
   const views=['top','front','back','left','right','bottom','persp'];
   $('dlStatus').textContent='⏳ Making 7 photos — please allow multiple downloads if your browser asks…';
   $('dlAllBtn').disabled=true;
@@ -566,6 +567,7 @@ $('dlAllBtn').onclick=async()=>{
   $('dlAllBtn').disabled=false;$('dlStatus').textContent='✅ All 7 photos downloaded for '+curFloor().name+'. Check your Downloads folder.';setView('persp');
 };
 $('recBtn').onclick=()=>{
+  if(mode!=='3d'){setMode('3d');setTimeout(()=>$('recBtn').click(),400);return;}
   if(!('MediaRecorder' in window)||!gl.captureStream){alert('Video recording is not supported in this browser. Please use Chrome or Edge on a computer or Android phone, then try again. Photos still work.');return;}
   try{
     const stream=gl.captureStream(30);
