@@ -257,21 +257,43 @@ function perimeterWalls(W,D){return [{x1:0,y1:0,x2:W,y2:0},{x1:W,y1:0,x2:W,y2:D}
 function mkFloor(name,items,rooms){return {name,items:items||[],rooms:rooms||[],walls:[]}}
 function shopTemplate(){
   const W=10.5,D=35;
+  // Ground Floor — Vijay's colour plan (image-57.png): front = y 0 (bottom of plan), back = y 35 (top).
+  // Measured from the plan: Branda y 0..5; shop x 0..7.2; washroom back-left; inner 4.5" wall at x 7.3;
+  // first-floor stairs zone x 7.2..10.5 (flight x 7.5..10, arrow y 7.5..25.5); basement stairs x 0.4..3.3, y 5..14;
+  // front door x 3.4..7.2 at y ~5.6; back-right room is Entry to stairs with a 2.5 ft door on the right wall y 29..31.5
+  // (stairs only — does NOT go inside the shop); shutter for the shop across the front at y ~5.3, x 3.4..10.1.
+  // Update (image-58.png): Entry to stairs renamed, 2.5 ft door + shop shutter added. Pillars y ~5.3 / 20.2 / 34.6.
   const ground=mkFloor('Ground Floor',[
-    {assetId:'billing',x:0.5,y:2,w:5,d:2,rot:0,label:'Billing Counter'},
-    {assetId:'cashcounter',x:5.8,y:2,w:3,d:2,rot:0,label:'Cash Counter'},
-    {assetId:'wallshelf',x:0.2,y:5,w:1,d:8,rot:0,label:'Shelf — left wall'},
-    {assetId:'wallshelf',x:9.3,y:5,w:1,d:8,rot:0,label:'Shelf — right wall'},
-    {assetId:'wallshelf',x:0.2,y:16,w:1,d:8,rot:0,label:'Shelf — left wall'},
-    {assetId:'wallshelf',x:9.3,y:16,w:1,d:8,rot:0,label:'Shelf — right wall'},
-    {assetId:'displayshelf',x:3.2,y:14,w:4,d:2,rot:0,label:'Central Display'},
-    {assetId:'displayshelf',x:3.2,y:19,w:4,d:2,rot:0,label:'Central Display'},
-    {assetId:'rack',x:0.5,y:26,w:3,d:2,rot:0,label:'Storage Rack'},
-    {assetId:'stairs',x:7.2,y:26,w:2.75,d:9,rot:0,label:'Stairs to First Floor'},
-    {assetId:'door',x:3.75,y:0,w:3,d:0.4,rot:0,label:'Front Entrance'},
-  ],[{x:0,y:28,w:6.5,d:7,label:'Washroom'},{x:0,y:0,w:10.5,d:35,label:'Shop'}]);
-  ground.walls=perimeterWalls(W,D);
-  ground.walls.push({x1:0,y1:28,x2:6.5,y2:28});
+    {assetId:'wallshelf',x:0.15,y:14.5,w:1,d:13,rot:0,label:'Shelves for Shop'},
+    {assetId:'stairs',x:7.5,y:7.5,w:2.5,d:18,rot:0,label:'Stairs'},
+    {assetId:'wallshelf',x:9.1,y:11,w:1,d:11,rot:0,label:'Stair Shelves'},
+    {assetId:'stairs',x:0.5,y:7,w:2.4,d:6.5,rot:0,label:'Stairs'},
+    {assetId:'billing',x:3.5,y:7.8,w:3,d:2,rot:0,label:'Counter'},
+    {assetId:'door',x:3.45,y:5.35,w:3.75,d:0.5,rot:0,label:'Front Entrance'},
+    {assetId:'window',x:3.4,y:5.3,w:6.7,d:0.4,rot:0,label:'Shutter for the shop'},
+    {assetId:'door',x:10.1,y:29,w:0.4,d:2.5,rot:0,label:'Door 2.5 ft — stairs only'},
+    {assetId:'toilet',x:0.6,y:31.5,w:2,d:2.5,rot:0,label:'Toilet'},
+    {assetId:'basin',x:3.2,y:32,w:2,d:1.5,rot:0,label:'Basin'},
+    {assetId:'storagebox',x:0,y:4.9,w:0.75,d:0.75,rot:0,label:'Pillar'},
+    {assetId:'storagebox',x:0,y:19.8,w:0.75,d:0.75,rot:0,label:'Pillar'},
+    {assetId:'storagebox',x:0,y:34.25,w:0.75,d:0.75,rot:0,label:'Pillar'},
+    {assetId:'storagebox',x:9.75,y:4.9,w:0.75,d:0.75,rot:0,label:'Pillar'},
+    {assetId:'storagebox',x:9.75,y:19.8,w:0.75,d:0.75,rot:0,label:'Pillar'},
+    {assetId:'storagebox',x:9.75,y:34.25,w:0.75,d:0.75,rot:0,label:'Pillar'},
+  ],[
+    {x:0,y:0,w:10.5,d:5,label:'Branda'},
+    {x:0,y:5,w:7.2,d:23,label:'Shop'},
+    {x:0,y:28,w:7.2,d:7,label:'Washroom'},
+    {x:7.2,y:6,w:3.3,d:22,label:'Stairs to First Floor'},
+    {x:7.2,y:29.5,w:3.3,d:5.5,label:'Entry to stairs'},
+  ]);
+  // Outer walls 9 in on left/right/back only — front is an open shopfront. Inner 4.5 in wall divides the shop from the first-floor stairs.
+  ground.walls=[
+    {x1:0,y1:0,x2:0,y2:D},
+    {x1:W,y1:0,x2:W,y2:D},
+    {x1:0,y1:D,x2:W,y2:D},
+    {x1:7.3,y1:6,x2:7.3,y2:28},
+  ];
   const basement=mkFloor('Basement',[{assetId:'rack',x:0.5,y:2,w:4,d:2,rot:0,label:'Stock Rack'},{assetId:'rack',x:0.5,y:8,w:4,d:2,rot:0,label:'Stock Rack'},{assetId:'storagebox',x:6,y:2,w:3,d:2,rot:0,label:'Storage Box'},{assetId:'stairs',x:7.2,y:20,w:2.75,d:8,rot:0,label:'Stairs to Shop'}],[{x:0,y:0,w:10.5,d:28,label:'Basement Storage'}]);
   basement.walls=perimeterWalls(W,28);
   const first=mkFloor('First Floor',[{assetId:'doublebed',x:1,y:2,w:6,d:6.5,rot:0,label:'Double Bed'},{assetId:'wardrobe',x:0.5,y:10,w:5,d:2,rot:0,label:'Wardrobe'},{assetId:'studytable',x:6,y:2,w:4,d:2,rot:0,label:'Study Table'},{assetId:'sofa',x:1,y:20,w:6,d:3,rot:0,label:'Sofa'},{assetId:'tvunit',x:1,y:26,w:5,d:1.5,rot:0,label:'TV Unit'}],[{x:0,y:0,w:10.5,d:35,label:'First Floor'}]);
@@ -395,7 +417,12 @@ function drawPlan(){
     if(a.shape==='cyl'){ctx.beginPath();ctx.arc(0,0,Math.min(it.w,it.d)*scale/2,0,Math.PI*2);ctx.stroke();}
     if(a.shape==='stairs'){ctx.fillStyle='#ffffff';for(let s=0;s<5;s++){ctx.fillRect(-it.w*scale/2+2,-it.d*scale/2+s*(it.d*scale/5)+2,it.w*scale-4,2);}}
     ctx.fillStyle='#ffffff';ctx.font='bold 11px Arial';ctx.textAlign='center';
-    const label=(it.label||a.name);ctx.fillText(label.length>18?label.slice(0,18):label,0,4);ctx.restore();ctx.textAlign='left';
+    const label=(it.label||a.name);
+    // Tall items (taller than wide, after any rotation) get a vertical label, like Vijay's plan.
+    const rot90=((it.rot||0)%180)!==0;const effW=rot90?it.d:it.w,effD=rot90?it.w:it.d;
+    if(effD>effW){const vlab=label.length>26?label.slice(0,26):label;ctx.save();ctx.rotate(-Math.PI/2);ctx.fillText(vlab,0,4);ctx.restore();}
+    else{ctx.fillText(label.length>18?label.slice(0,18):label,0,4);}
+    ctx.restore();ctx.textAlign='left';
     if(selected&&selected.kind==='item'&&selected.index===i){
       ctx.fillStyle='#f59e0b';ctx.fillRect(ox+(it.x+it.w)*scale-6,oy+(it.y+it.d)*scale-6,12,12);
     }
@@ -466,7 +493,7 @@ function updateSelBar(){
   else if(selected.kind==='room'){const r=f.rooms[selected.index];$('selInfo').textContent='Selected room: '+r.label;$('selSize').textContent=(r.w*r.d).toFixed(0)+' sq ft';}
   else{$('selInfo').textContent='Selected: Wall';$('selSize').textContent='';}
 }
-$('rotateBtn').onclick=()=>{if(selected&&selected.kind==='item'){pushUndo();const it=curFloor().items[selected.index];it.rot=((it.rot||0)+90)%360;const t=it.w;it.w=it.d;it.d=t;renderAll();}};
+$('rotateBtn').onclick=()=>{if(selected&&selected.kind==='item'){pushUndo();const it=curFloor().items[selected.index];it.rot=0;const t=it.w;it.w=it.d;it.d=t;renderAll();}};
 $('delBtn').onclick=()=>{if(!selected)return;pushUndo();const f=curFloor();if(selected.kind==='item')f.items.splice(selected.index,1);if(selected.kind==='room')f.rooms.splice(selected.index,1);if(selected.kind==='wall')f.walls.splice(selected.index,1);selected=null;renderAll();};
 $('undoBtn').onclick=()=>{if(!undoStack.length)return;redoStack.push(JSON.stringify(project));restore(undoStack.pop());updateUndoBtns();};
 $('redoBtn').onclick=()=>{if(!redoStack.length)return;undoStack.push(JSON.stringify(project));restore(redoStack.pop());updateUndoBtns();};
@@ -510,16 +537,17 @@ function rebuild3D(){
     f.items.forEach(it=>{
       const a=assetById(it.assetId);const cx=it.x+it.w/2, cz=it.y+it.d/2;
       const g=new THREE.Group();g.position.set(cx,yOff+0.3,cz);g.rotation.y=-((it.rot||0)*Math.PI/180);
+      const ph=(it.label==='Pillar')?10:a.h; // pillars are full-height (10 ft) columns, not 2 ft boxes
       if(a.shape==='cyl'){const cyl=new THREE.Mesh(new THREE.CylinderGeometry(Math.min(it.w,it.d)/2,Math.min(it.w,it.d)/2,a.h,20),new THREE.MeshStandardMaterial({color:a.c3}));cyl.position.y=a.h/2;g.add(cyl);}
       else if(a.shape==='flat'){g.add(box(it.w,0.2,it.d,a.c3,0,0.1,0));}
       else if(a.shape==='stairs'){for(let s=0;s<6;s++){g.add(box(it.w,0.5,(it.d/6),a.c3,0,0.5+s*1.4,-it.d/2+(s+0.5)*(it.d/6)));}}
       else{
-        g.add(box(it.w,a.h,it.d,a.c3,0,a.h/2,0));
+        g.add(box(it.w,ph,it.d,a.c3,0,ph/2,0));
         if(a.id==='doublebed'||a.id==='singlebed'){g.add(box(it.w*0.9,0.6,it.d*0.25,0xffffff,0,a.h+0.2,-it.d/2+0.4));}
         if(a.id==='sofa'){g.add(box(it.w,1.2,0.6,a.c3,0,a.h+0.3,-it.d/2+0.3));}
         if(a.id==='dining'||a.id==='table'){g.add(box(it.w,0.3,it.d,0xffffff,0,a.h+0.1,0));}
       }
-      const lab=labelSprite(it.label||a.name);lab.position.y=a.h+2;g.add(lab);
+      const lab=labelSprite(it.label||a.name);lab.position.y=ph+2;g.add(lab);
       floorGroup.add(g);
     });
   });
