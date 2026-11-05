@@ -421,6 +421,10 @@ function drawPlan(){
     // Tall items (taller than wide, after any rotation) get a vertical label, like Vijay's plan.
     const rot90=((it.rot||0)%180)!==0;const effW=rot90?it.d:it.w,effD=rot90?it.w:it.d;
     if(effD>effW){const vlab=label.length>26?label.slice(0,26):label;ctx.save();ctx.rotate(-Math.PI/2);ctx.fillText(vlab,0,4);ctx.restore();}
+    // Shutter is a thin light strip on the Shop/Branda boundary: white text centred on it
+    // overflows onto the white plan and collides with the 'Shop' room label below it.
+    // Draw it in dark text just above the strip, inside the Branda, clear of both labels.
+    else if(it.assetId==='window'){ctx.fillStyle='#26221c';ctx.fillText(label.length>18?label.slice(0,18):label,0,-9);}
     else{ctx.fillText(label.length>18?label.slice(0,18):label,0,4);}
     ctx.restore();ctx.textAlign='left';
     if(selected&&selected.kind==='item'&&selected.index===i){
