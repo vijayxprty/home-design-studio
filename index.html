@@ -404,7 +404,6 @@ function drawPlan(){
     ctx.fillStyle='rgba(15,118,110,0.10)';ctx.fillRect(ox+r.x*scale,oy+r.y*scale,r.w*scale,r.d*scale);
     ctx.strokeStyle=selected&&selected.kind==='room'&&selected.index===i?'#f59e0b':'#0f766e';ctx.lineWidth=selected&&selected.kind==='room'&&selected.index===i?3:1.5;
     ctx.strokeRect(ox+r.x*scale,oy+r.y*scale,r.w*scale,r.d*scale);
-    ctx.fillStyle='#26221c';ctx.font='bold 13px Arial';ctx.fillText(r.label+'  ('+(r.w*r.d).toFixed(0)+' sq ft)',ox+r.x*scale+5,oy+r.y*scale+18);
   });
   ctx.strokeStyle='#26221c';ctx.lineWidth=5;ctx.lineCap='round';
   f.walls.forEach((w,i)=>{ctx.beginPath();ctx.moveTo(ox+w.x1*scale,oy+w.y1*scale);ctx.lineTo(ox+w.x2*scale,oy+w.y2*scale);ctx.strokeStyle=selected&&selected.kind==='wall'&&selected.index===i?'#f59e0b':'#26221c';ctx.stroke();});
@@ -421,15 +420,20 @@ function drawPlan(){
     // Tall items (taller than wide, after any rotation) get a vertical label, like Vijay's plan.
     const rot90=((it.rot||0)%180)!==0;const effW=rot90?it.d:it.w,effD=rot90?it.w:it.d;
     if(effD>effW){const vlab=label.length>26?label.slice(0,26):label;ctx.save();ctx.rotate(-Math.PI/2);ctx.fillText(vlab,0,4);ctx.restore();}
-    // Shutter is a thin light strip on the Shop/Branda boundary: white text centred on it
-    // overflows onto the white plan and collides with the 'Shop' room label below it.
-    // Draw it in dark text just above the strip, inside the Branda, clear of both labels.
-    else if(it.assetId==='window'){ctx.fillStyle='#26221c';ctx.fillText(label.length>18?label.slice(0,18):label,0,-9);}
+    // Shutter is a thin light strip on the Shop/Branda boundary (only ~88px wide on the
+    // 900px canvas, while 'Shutter for the shop' at 11px is ~122px, so one line truncates
+    // and spills past the strip). Draw it in dark text on two lines just above the strip,
+    // inside the Branda, clear of the Shop label below and the Pillar label at the corner.
+    else if(it.assetId==='window'){ctx.fillStyle='#26221c';ctx.font='bold 10px Arial';ctx.fillText('Shutter for',0,-20);ctx.fillText('the shop',0,-9);}
     else{ctx.fillText(label.length>18?label.slice(0,18):label,0,4);}
     ctx.restore();ctx.textAlign='left';
     if(selected&&selected.kind==='item'&&selected.index===i){
       ctx.fillStyle='#f59e0b';ctx.fillRect(ox+(it.x+it.w)*scale-6,oy+(it.y+it.d)*scale-6,12,12);
     }
+  });
+  // Room labels last, so no item (e.g. the shutter strip) can paint over them.
+  f.rooms.forEach((r,i)=>{
+    ctx.fillStyle='#26221c';ctx.font='bold 13px Arial';ctx.fillText(r.label+'  ('+(r.w*r.d).toFixed(0)+' sq ft)',ox+r.x*scale+5,oy+r.y*scale+18);
   });
   if(wallStart){ctx.strokeStyle='#0f766e';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(ox+wallStart.x*scale,oy+wallStart.y*scale);ctx.lineTo(ox+wallStart._mx*scale,oy+wallStart._my*scale);ctx.stroke();}
   ctx.fillStyle='#26221c';ctx.font='12px Arial';ctx.fillText('1 square = 1 ft  •  Plot '+project.plotW+' × '+project.plotD+' ft',ox,plan.height-8);
